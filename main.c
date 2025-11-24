@@ -18,6 +18,7 @@
  * as funções do grafo.
  * 21/09/2025, Leonardo Patriani: Melhoria da interface com busca por ID ou nome.
  * 28/09/2025, Vitor Arantes e Andre Guimaraes: Limpeza final e ajuste dos textos do menu.
+ * 20/11/2025, Andre Guimaraes: Adição das novas funções
  *
  * COMO COMPILAR:
  * gcc main.c TGrafoLista.c -o programa_grafos

@@ -20,7 +20,10 @@
  * 21/09/2025, Vitor Arantes: Implementação da análise de conexidade (conexo/desconexo)
  * 22/09/2025, Leonardo Patriani: Implementação da lógica de recomendação
  * 28/09/2025, Andre Guimaraes: Refatoração da função de mostrar conteúdo do arquivo
- *
+ * 16/11/2025, Vitor Arantes: Adição da função de apresentar Graus do Vertice
+ * 17/11/2025, Andre Guimaraes: Adição da função de verificar se o Grafo é Euleriano
+ * 18/11/2025, Leonardo Patriani: Adição da função de verificar Teoremas Hamiltonianos
+ * 
  *******************************************************************************/
 
 #include "TGrafoLista.h"

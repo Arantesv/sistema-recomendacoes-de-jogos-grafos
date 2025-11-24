@@ -20,6 +20,7 @@
  * e das rotinas de leitura/escrita de arquivo.
  * 21/09/2025, Vitor Arantes: Implementação da análise de conexidade (conexo/desconexo)
  * 28/09/2025, Andre Guimaraes: Limpeza final do código
+ * 20/11/2025, Andre Guimaraes: Adição das novas funções
  *
  *******************************************************************************/
 #ifndef T_GRAFO_LISTA_H
