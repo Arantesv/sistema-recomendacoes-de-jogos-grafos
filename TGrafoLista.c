@@ -291,21 +291,11 @@ Grafo *lerArquivo(const char *nome_arquivo)
 
     fscanf(arquivo, "%d", &num_a_entradas);
 
-    // Para grafos não direcionados, lemos apenas metade das linhas,
-    // pois a função insereAresta já cria a aresta de volta.
-    int arestas_a_ler = (tipo < 4) ? num_a_entradas / 2 : num_a_entradas;
-
-    for (int i = 0; i < arestas_a_ler; i++)
+    for (int i = 0; i < num_a_entradas; i++)
     {
         int u, v, w;
         fscanf(arquivo, "%d %d %d", &u, &v, &w);
         insereAresta(grafo, u, v, w);
-
-        if (tipo < 4)
-        {
-            // Pula a linha duplicada correspondente no arquivo
-            fscanf(arquivo, "%d %d %d", &v, &u, &w);
-        }
     }
 
     fclose(arquivo);
@@ -635,4 +625,201 @@ void apresentaConexidade(Grafo *grafo)
     {
         printf("Resultado: O grafo é DESCONEXO.\n");
     }
+}
+
+typedef struct InfoGrau
+{
+    int id;
+    int grau;
+} InfoGrau;
+
+int comparaGraus(const void *a, const void *b)
+{
+    return ((InfoGrau *)b)->grau - ((InfoGrau *)a)->grau; // Decrescente
+}
+
+// 1. ANÁLISE DE GRAUS (Popularidade/Conectividade)
+void apresentaGraus(Grafo *grafo)
+{
+    if (grafo->num_vertices == 0)
+    {
+        printf("Grafo vazio.\n");
+        return;
+    }
+
+    InfoGrau *lista_graus = (InfoGrau *)malloc(grafo->num_vertices * sizeof(InfoGrau));
+
+    for (int i = 0; i < grafo->num_vertices; i++)
+    {
+        int contador = 0;
+        No *atual = grafo->lista_adj[i];
+        while (atual)
+        {
+            contador++;
+            atual = atual->prox;
+        }
+        lista_graus[i].id = i;
+        lista_graus[i].grau = contador;
+    }
+
+    // Ordena para mostrar os "mais conectados" primeiro
+    qsort(lista_graus, grafo->num_vertices, sizeof(InfoGrau), comparaGraus);
+
+    printf("\n--- Grau dos Vértices (Conectividade) ---\n");
+    printf("| %-4s | %-40s | %-4s |\n", "ID", "Jogo", "Grau");
+    printf("|------|------------------------------------------|------|\n");
+
+    // Mostra top 10 ou todos se tiver menos que 10
+    int limite = grafo->num_vertices; // Pode mudar para 10 se quiser resumir
+    for (int i = 0; i < limite; i++)
+    {
+        int id_real = lista_graus[i].id;
+        printf("| %-4d | %-40.40s | %-4d |\n",
+               id_real,
+               grafo->dados_vertices[id_real].rotulo,
+               lista_graus[i].grau);
+    }
+    printf("--------------------------------------------------\n");
+    free(lista_graus);
+}
+
+void verificaEuleriano(Grafo *grafo)
+{
+    printf("\n--- Análise Euleriana ---\n");
+
+    if (!verificaConexao(grafo))
+    {
+        printf("Resultado: O grafo NÃO é Euleriano (é desconexo).\n");
+        printf("Explicação: Para ser Euleriano, o grafo precisa ser conexo.\n");
+        return;
+    }
+
+    // Conta vértices de grau ímpar
+    int impares = 0;
+    for (int i = 0; i < grafo->num_vertices; i++)
+    {
+        int grau = 0;
+        No *atual = grafo->lista_adj[i];
+        while (atual)
+        {
+            grau++;
+            atual = atual->prox;
+        }
+        if (grau % 2 != 0)
+        {
+            impares++;
+        }
+    }
+
+    printf("Número de vértices com grau ímpar: %d\n", impares);
+
+    if (impares == 0)
+    {
+        printf("Resultado: O grafo é EULERIANO.\n");
+        printf("Existe um ciclo que percorre todas as similaridades e volta ao jogo inicial.\n");
+    }
+    else if (impares == 2)
+    {
+        printf("Resultado: O grafo é SEMI-EULERIANO.\n");
+        printf("Existe um caminho que percorre todas as similaridades, mas começa e termina em jogos diferentes.\n");
+    }
+    else
+    {
+        printf("Resultado: O grafo NÃO é Euleriano.\n");
+        printf("Possui mais de 2 vértices de grau ímpar.\n");
+    }
+}
+
+// Retorna o grau de um vértice específico
+int obterGrau(Grafo *grafo, int v)
+{
+    int grau = 0;
+    No *atual = grafo->lista_adj[v];
+    while (atual)
+    {
+        grau++;
+        atual = atual->prox;
+    }
+    return grau;
+}
+
+// Verifica se dois vértices são adjacentes (vizinhos)
+int saoAdjacentes(Grafo *grafo, int u, int v)
+{
+    No *atual = grafo->lista_adj[u];
+    while (atual)
+    {
+        if (atual->vertice_adj == v)
+            return 1;
+        atual = atual->prox;
+    }
+    return 0;
+}
+
+int verificarTeoremasHamiltonianos(Grafo *grafo)
+{
+    int n = grafo->num_vertices;
+    if (n < 3)
+    {
+        printf("Grafo muito pequeno para ser Hamiltoniano (N < 3).\n");
+        return 0;
+    }
+
+    printf("\n--- Análise de Teoremas Hamiltonianos ---\n");
+
+    // 1. Teorema de Dirac
+    // Se grau(v) >= n/2 para TODO v, então é Hamiltoniano.
+    int satisfazDirac = 1;
+    for (int i = 0; i < n; i++)
+    {
+        if (obterGrau(grafo, i) < n / 2.0)
+        {
+            satisfazDirac = 0;
+            break;
+        }
+    }
+
+    if (satisfazDirac)
+    {
+        printf("[Teorema de Dirac]: ATENDIDO.\n");
+        printf("O grafo é Hamiltoniano.\n");
+        printf("Todos os vértices têm grau >= %d (metade de N).\n", n / 2);
+        return 1;
+    }
+    else
+    {
+        printf("[Teorema de Dirac]: Não atendido (existem vértices com grau baixo).\n");
+    }
+
+    // 2. Teorema de Ore
+    // Se para todo par não-adjacente (u,v), grau(u) + grau(v) >= n, então é Hamiltoniano.
+    int satisfazOre = 1;
+    for (int u = 0; u < n; u++)
+    {
+        for (int v = u + 1; v < n; v++)
+        {
+            if (!saoAdjacentes(grafo, u, v))
+            {
+                if (obterGrau(grafo, u) + obterGrau(grafo, v) < n)
+                {
+                    satisfazOre = 0;
+                    goto FimOre;
+                }
+            }
+        }
+    }
+
+FimOre:
+    if (satisfazOre)
+    {
+        printf("[Teorema de Ore]: ATENDIDO.\n");
+        printf("O grafo é Hamiltoniano.\n");
+        return 1;
+    }
+    else
+    {
+        printf("[Teorema de Ore]: Não atendido (soma de graus de não-vizinhos é baixa).\n");
+    }
+    printf("O grafo ainda pode ser Hamiltoniano, mas não garantido pelos teoremas clássicos.\n");
+    return 0;
 }

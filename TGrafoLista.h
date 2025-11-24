@@ -66,5 +66,8 @@ int obtemIdPorEntrada(Grafo *grafo);
 int buscaVerticePorNome(Grafo *grafo, const char *nome);
 void obtemRecomendacoes(Grafo *grafo, int id_vertice);
 void apresentaConexidade(Grafo *grafo);
+void apresentaGraus(Grafo *grafo);
+void verificaEuleriano(Grafo *grafo);
+int verificarTeoremasHamiltonianos(Grafo *grafo);
 
 #endif

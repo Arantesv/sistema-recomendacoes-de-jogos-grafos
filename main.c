@@ -41,7 +41,10 @@ void exibirMenu()
     printf(" h) Mostrar grafo\n");
     printf(" i) Apresentar a conexidade do grafo\n");
     printf(" j) Recomendar jogos similares\n");
-    printf(" k) Encerrar a aplicação\n");
+    printf(" k) Analisar grau dos vértices\n");
+    printf(" l) Verificar se é Euleriano\n");
+    printf(" m) Verificar Teoremas Hamiltonianos\n");
+    printf(" n) Encerrar a aplicação\n");
     printf("============================================\n");
     printf(" Escolha uma opção: ");
 }
@@ -192,8 +195,19 @@ int main()
             }
             break;
         }
-
         case 'k':
+            apresentaGraus(grafo);
+            break;
+
+        case 'l':
+            verificaEuleriano(grafo);
+            break;
+
+        case 'm':
+            verificarTeoremasHamiltonianos(grafo);
+            break;
+
+        case 'n':
             printf("Encerrando a aplicação...\n");
             break;
 
